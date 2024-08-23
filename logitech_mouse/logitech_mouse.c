@@ -41,18 +41,20 @@ static NTSTATUS device_initialize(PCWSTR device_name)
 bool logi_mouse_open(void)
 {
 	NTSTATUS status = 0;
-	if (g_input == 0) {
-
-		wchar_t buffer0[] = L"\\??\\ROOT#SYSTEM#0002#{1abc05c0-c378-41b9-9cef-df1aba82b015}";
-
-		status = device_initialize(buffer0);
-		if (NT_SUCCESS(status))
-			g_found_mouse = 1;
-		else {
-			wchar_t buffer1[] = L"\\??\\ROOT#SYSTEM#0003#{1abc05c0-c378-41b9-9cef-df1aba82b015}";
-			status = device_initialize(buffer1);
+	wchar_t buffer[256] = {L'\0'};
+	if (g_input == 0) 
+	{
+		wcscpy(buffer, L"\\??\\ROOT#SYSTEM#0000#{1abc05c0-c378-41b9-9cef-df1aba82b015}");
+		for (int i = 0;i < 10; ++i)
+		{
+			buffer[19] = i + '0' ;
+			status = device_initialize(buffer);
 			if (NT_SUCCESS(status))
+			{
+
 				g_found_mouse = 1;
+				break;
+			}
 		}
 	}
 	return status == 0;
